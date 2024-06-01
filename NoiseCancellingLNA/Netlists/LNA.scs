@@ -1,0 +1,70 @@
+// Generated for: spectre
+// Generated on: Apr 17 15:26:56 2024
+// Design library name: EE4902
+// Design cell name: ResistiveFeedbackLNA
+// Design view name: schematic
+simulator lang=spectre
+global 0 vdd!
+parameters ms=20 mg=80 R2=500 R1=200 Ib2=900u Ib1=10u VDD=0.9 circ_temp=27 frf=1G prf=-40 
+include "/cad/library/TSMC/tsmc_28/28/28HPC_RF/tn28crsp029w1_1_8_2p2a/tsmcN28/../models/spectre/toplevel.scs" section=TOP_TT
+
+// Library name: EE4902
+// Cell name: NoiseCancellingLNA
+// View name: schematic
+M2 (Vbias Vbias 0 0) nmos_rf_nw multi=1 dw1=-1.4923e-20 lr=30n nr=4 \
+        sa=489.339n sa1=450.382n sa2=480.62n sa3=517.531n sa4=488.164n \
+        sa5=495.907n sa6=512.134n sa7=450.098n sap=171.021n sapb=182.229n \
+        sb=489.339n sb1=450.382n sb2=480.62n sb3=517.531n sca=2.93321 \
+        scb=7.2676e-05 scc=3.63156e-09 sodx=80n sodx1=308.909n \
+        sodx2=927.325n sodx4=352.412n sodxa=80n sodxb=80n sody=505.00n \
+        spa=100n spa1=100n spa2=100n spa3=100n spba=115.715n \
+        spba1=117.043n sd=100n spmb=1.11111e+15 spmt=1.11111e+15 spomb=0 \
+        spomb1=1.11111e+60 spomt=0 spomt1=1.11111e+60 wr=600n dinsaflag=0 \
+        ngcon=2 sobn=835n sobe=410n sobs=835n sobw=410n cbflag=2 rcmflag=1
+M1 (Vout\- net3 0 0) nmos_rf_nw multi=ms dw1=-1.4923e-20 lr=30n nr=4 \
+        sa=489.339n sa1=450.382n sa2=480.62n sa3=517.531n sa4=488.164n \
+        sa5=495.907n sa6=512.134n sa7=450.098n sap=171.021n sapb=182.229n \
+        sb=489.339n sb1=450.382n sb2=480.62n sb3=517.531n sca=2.93321 \
+        scb=7.2676e-05 scc=3.63156e-09 sodx=80n sodx1=308.909n \
+        sodx2=927.325n sodx4=352.412n sodxa=80n sodxb=80n sody=505.00n \
+        spa=100n spa1=100n spa2=100n spa3=100n spba=115.715n \
+        spba1=117.043n sd=100n spmb=1.11111e+15 spmt=1.11111e+15 spomb=0 \
+        spomb1=1.11111e+60 spomt=0 spomt1=1.11111e+60 wr=600n dinsaflag=0 \
+        ngcon=2 sobn=835.00n sobe=410.0n sobs=835.00n sobw=410.0n cbflag=2 \
+        rcmflag=1
+M0 (Vout\+ vdd! net2 0) nmos_rf_nw multi=mg dw1=-1.4923e-20 lr=30n nr=4 \
+        sa=489.339n sa1=450.382n sa2=480.62n sa3=517.531n sa4=488.164n \
+        sa5=495.907n sa6=512.134n sa7=450.098n sap=171.021n sapb=182.229n \
+        sb=489.339n sb1=450.382n sb2=480.62n sb3=517.531n sca=2.93321 \
+        scb=7.2676e-05 scc=3.63156e-09 sodx=80n sodx1=308.909n \
+        sodx2=927.325n sodx4=352.412n sodxa=80n sodxb=80n sody=505.00n \
+        spa=100n spa1=100n spa2=100n spa3=100n spba=115.715n \
+        spba1=117.043n sd=100n spmb=1.11111e+15 spmt=1.11111e+15 spomb=0 \
+        spomb1=1.11111e+60 spomt=0 spomt1=1.11111e+60 wr=600n dinsaflag=0 \
+        ngcon=2 sobn=835.00n sobe=410.0n sobs=835.00n sobw=410.0n cbflag=2 \
+        rcmflag=1
+C1 (net1 net2) capacitor c=1u
+C0 (net2 net3) capacitor c=1u
+R2 (vdd! Vout\-) resistor r=R2
+R1 (vdd! Vout\+) resistor r=R1
+R0 (net3 Vbias) resistor r=1M
+I10 (net2 0) isource dc=Ib2 type=dc
+I0 (vdd! Vbias) isource dc=Ib1 type=dc
+E0 (Vout 0 Vout\+ Vout\-) vcvs gain=1.0
+PORT2 (Vout 0) port r=50 dc=0 type=sine
+Vs (net1 0) port r=50 type=sine freq=frf dbm=prf freq2=frf + 1M dbm2=prf \
+        fundname="RF1" fundname2="RF2" mag=1
+V0 (vdd! 0) vsource dc=VDD type=dc
+simulatorOptions options psfversion="1.4.0" reltol=1e-3 vabstol=1e-6 \
+    iabstol=1e-12 temp=circ_temp tnom=27 scalem=1.0 scale=1.0 gmin=1e-12 rforce=1 \
+    maxnotes=5 maxwarns=5 digits=5 cols=80 pivrel=1e-3 \
+    sensfile="../psf/sens.output" checklimitdest=psf 
+
+dc_test dc 
+ac_test ac start=0.1G stop=10G dec=100 values=[1G]
+sp_test sp start=0.1G stop=10G dec=100 donoise=yes ports=[Vs PORT2] oprobe=PORT2 iprobe=Vs values=[1G] file="sp.out" datatype="dbphase"
+noise_test Vout vdd! noise start=0.1G stop=10G dec=100 values=[1G] iprobe=Vs
+
+print V(Vout), I(V0), M0:ids, M0:gm, M0:gds, M0:vth, M0:vdsat, M0:cgs, M0:cgd, M0:cgg, M1:gm, M1:gds, M1:vth, M1:vdsat, M1:cgs, M1:cgd, M1:cgg, name=dc_test to="dc.out"
+print re(V(Vout)), im(V(Vout)), re(V(net2)), im(V(net2)), name=ac_test to="ac.out"
+print noise_test:NF, name=noise_test to="noise.out"

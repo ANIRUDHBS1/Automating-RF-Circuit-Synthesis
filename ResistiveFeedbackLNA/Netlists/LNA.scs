@@ -1,0 +1,69 @@
+// Generated for: spectre
+// Generated on: Apr 17 15:26:56 2024
+// Design library name: EE4902
+// Design cell name: ResistiveFeedbackLNA
+// Design view name: schematic
+simulator lang=spectre
+global 0 vdd!
+parameters m1=20 m2=80 Rf=300 Ib=10u Ls=1p Lg=100n circ_temp=27 VDD=0.9 frf=1.58G prf=-40 
+include "/cad/library/TSMC/tsmc_28/28/28HPC_RF/tn28crsp029w1_1_8_2p2a/tsmcN28/../models/spectre/toplevel.scs" section=TOP_TT
+
+// Library name: EE4902
+// Cell name: ResistiveFeedbackLNA
+// View name: schematic
+M0 (net3 net7 net6 net6) nmos_rf_nw multi=m1 dw1=-1.4923e-20 lr=30n nr=4 \
+        sa=489.339n sa1=450.382n sa2=480.62n sa3=517.531n sa4=488.164n \
+        sa5=495.907n sa6=512.134n sa7=450.098n sap=171.021n sapb=182.229n \
+        sb=489.339n sb1=450.382n sb2=480.62n sb3=517.531n sca=2.93321 \
+        scb=7.2676e-05 scc=3.63156e-09 sodx=80n sodx1=308.909n \
+        sodx2=927.325n sodx4=352.412n sodxa=80n sodxb=80n sody=505.00n \
+        spa=100n spa1=100n spa2=100n spa3=100n spba=115.715n \
+        spba1=117.043n sd=100n spmb=1.11111e+15 spmt=1.11111e+15 spomb=0 \
+        spomb1=1.11111e+60 spomt=0 spomt1=1.11111e+60 wr=600n dinsaflag=0 \
+        ngcon=2 sobn=835.00n sobe=410.0n sobs=835.00n sobw=410.0n cbflag=2 \
+        rcmflag=1
+M1 (net3 Vbias vdd! vdd!) pmos_rf_nw multi=m2 dw1=-1.4923e-20 lr=30n nr=4 \
+        sa=489.339n sa1=450.382n sa2=480.62n sa3=517.531n sa4=488.164n \
+        sa5=495.907n sa6=512.134n sa7=450.098n sap=171.021n sapb=182.229n \
+        sb=489.339n sb1=450.382n sb2=480.62n sb3=517.531n sca=2.93321 \
+        scb=7.2676e-05 scc=3.63156e-09 sodx=80n sodx1=308.909n \
+        sodx2=927.325n sodx4=352.412n sodxa=80n sodxb=80n sody=505.00n \
+        spa=100n spa1=100n spa2=100n spa3=100n spba=115.715n \
+        spba1=117.043n sd=100n spmb=1.11111e+15 spmt=1.11111e+15 spomb=0 \
+        spomb1=1.11111e+60 spomt=0 spomt1=1.11111e+60 wr=600n dinsaflag=0 \
+        ngcon=2 sobn=835.00n sobe=410.0n sobs=835.00n sobw=410.0n cbflag=2 \
+        rcmflag=1
+M2 (Vbias Vbias vdd! vdd!) pmos_rf_nw multi=1 dw1=-1.4923e-20 lr=30n nr=4 \
+        sa=489.339n sa1=450.382n sa2=480.62n sa3=517.531n sa4=488.164n \
+        sa5=495.907n sa6=512.134n sa7=450.098n sap=171.021n sapb=182.229n \
+        sb=489.339n sb1=450.382n sb2=480.62n sb3=517.531n sca=2.93321 \
+        scb=7.2676e-05 scc=3.63156e-09 sodx=80n sodx1=308.909n \
+        sodx2=927.325n sodx4=352.412n sodxa=80n sodxb=80n sody=505.00n \
+        spa=100n spa1=100n spa2=100n spa3=100n spba=115.715n \
+        spba1=117.043n sd=100n spmb=1.11111e+15 spmt=1.11111e+15 spomb=0 \
+        spomb1=1.11111e+60 spomt=0 spomt1=1.11111e+60 wr=600n dinsaflag=0 \
+        ngcon=2 sobn=835n sobe=410n sobs=835n sobw=410n cbflag=2 rcmflag=1
+R0 (net2 net3) resistor r=Rf
+I0 (Vbias 0) isource dc=Ib type=dc
+C0 (net1 net2) capacitor c=1u
+C1 (net3 net4) capacitor c=1u
+Vs (net1 0) port r=50 dc=0 type=sine freq=frf dbm=prf freq2=frf + 1M dbm2=prf \
+        fundname="RF1" fundname2="RF2" mag=1
+E0 (Vout 0 net4 0) vcvs gain=1.0
+V0 (vdd! 0) vsource dc=VDD type=dc
+PORT2 (Vout 0) port r=50 dc=0 type=dc
+L1 (0 net6) inductor l=Ls
+L0 (net2 net7) inductor l=Lg
+simulatorOptions options psfversion="1.4.0" reltol=1e-3 vabstol=1e-6 \
+    iabstol=1e-12 temp=circ_temp tnom=27 scalem=1.0 scale=1.0 gmin=1e-12 rforce=1 \
+    maxnotes=5 maxwarns=5 digits=5 cols=80 pivrel=1e-3 \
+    sensfile="../psf/sens.output" checklimitdest=psf 
+
+dc_test dc 
+ac_test ac start=0.1G stop=10G dec=100 values=[1.58G]
+sp_test sp start=0.1G stop=10G dec=100 donoise=yes ports=[Vs PORT2] oprobe=PORT2 iprobe=Vs values=[1.58G] file="sp.out" datatype="dbphase"
+noise_test Vout vdd! noise start=0.1G stop=10G dec=100 values=[1.58G] iprobe=Vs
+
+print V(Vout), I(V0), M0:ids, M0:gm, M0:gds, M0:vth, M0:vdsat, M0:cgs, M0:cgd, M0:cgg, name=dc_test to="dc.out"
+print re(V(Vout)), im(V(Vout)), re(V(net2)), im(V(net2)), name=ac_test to="ac.out"
+print noise_test:NF, name=noise_test to="noise.out"
